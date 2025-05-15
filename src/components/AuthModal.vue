@@ -84,7 +84,7 @@
           </VeeForm>
 
           <!-- Registration Form -->
-          <VeeForm v-show="tab === 'register'">
+          <VeeForm v-show="tab === 'register'" :validation-schema="registerSchema">
             <!-- Name -->
             <div class="mb-3">
               <label class="inline-block mb-2">Name</label>
@@ -94,6 +94,7 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Name"
               />
+              <ErrorMessage class="text-red-500" name="name" />
             </div>
 
             <!-- Email -->
@@ -105,6 +106,7 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email"
               />
+              <ErrorMessage class="text-red-500" email="email" />
             </div>
 
             <!-- Age -->
@@ -115,6 +117,7 @@
                 type="number"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               />
+              <ErrorMessage class="text-red-500" name="age" />
             </div>
 
             <!-- Password -->
@@ -126,6 +129,7 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Password"
               />
+              <ErrorMessage class="text-red-500" name="password" />
             </div>
 
             <!-- Confirm Password -->
@@ -137,24 +141,29 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Confirm Password"
               />
+              <ErrorMessage class="text-red-500" name="confirm_password" />
             </div>
 
             <!-- Country -->
             <div class="mb-3">
               <label class="inline-block mb-2">Country</label>
               <VeeField
-                name="country"
                 as="select"
+                name="country"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               >
                 <option value="USA">USA</option>
                 <option value="Mexico">Mexico</option>
                 <option value="Germany">Germany</option>
               </VeeField>
+              <ErrorMessage class="text-red-500" name="country" />
             </div>
+
             <!-- TOS -->
             <div class="mb-3 pl-6">
               <VeeField name="tos" type="checkbox" class="w-4 h-4 float-left -ml-6 mt-1 rounded" />
+              <ErrorMessage class="text-red-500" name="tos" />
+
               <label class="inline-block">Accept terms of service</label>
             </div>
             <button
@@ -187,6 +196,15 @@ export default {
   data() {
     return {
       tab: 'login',
+      registerSchema: {
+        name: 'required',
+        email: 'required',
+        age: 'required',
+        password: 'required',
+        confirm_password: 'required|same:password',
+        country: 'required',
+        tos: 'required',
+      },
     }
   },
 }
