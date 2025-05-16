@@ -86,7 +86,11 @@
           </VeeForm>
 
           <!-- Registration Form -->
-          <VeeForm v-show="tab === 'register'" :validation-schema="registerSchema">
+          <VeeForm
+            v-show="tab === 'register'"
+            :validation-schema="registerSchema"
+            @submit="onRegister"
+          >
             <!-- Name -->
             <div class="mb-3">
               <label class="inline-block mb-2">Name</label>
@@ -158,13 +162,19 @@
                 <option value="USA">USA</option>
                 <option value="Mexico">Mexico</option>
                 <option value="Germany">Germany</option>
+                <option value="Australia">Australia</option>
               </VeeField>
               <ErrorMessage class="text-red-500" name="country" />
             </div>
 
             <!-- TOS -->
             <div class="mb-3 pl-6">
-              <VeeField name="tos" type="checkbox" class="w-4 h-4 float-left -ml-6 mt-1 rounded" />
+              <VeeField
+                name="tos"
+                value="1"
+                type="checkbox"
+                class="w-4 h-4 float-left -ml-6 mt-1 rounded"
+              />
               <ErrorMessage class="text-red-500" name="tos" />
 
               <label class="inline-block">Accept terms of service</label>
@@ -205,10 +215,17 @@ export default {
         age: 'required|min_value:18|max_value:99',
         password: 'required|min:3|max:100',
         confirm_password: 'required|confirmed:@password',
-        country: 'required',
+        country: 'required|excluded:Australia',
         tos: 'required',
       },
     }
+  },
+
+  methods: {
+    onRegister(values) {
+      console.log('Registering user with values:', values)
+      // Handle registration logic here
+    },
   },
 }
 </script>

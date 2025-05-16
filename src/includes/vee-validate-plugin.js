@@ -2,6 +2,7 @@ import {
   alpha_spaces as alphaSpaces,
   confirmed,
   email,
+  not_one_of as excluded,
   max,
   max_value as maxValue,
   min,
@@ -26,5 +27,6 @@ export default {
     defineRule('max_value', maxValue)
     defineRule('regex', regex)
     defineRule('confirmed', confirmed)
+    defineRule('excluded', excluded)
   },
 }
