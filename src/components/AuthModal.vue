@@ -60,11 +60,13 @@
             <!-- Email -->
             <div class="mb-3">
               <label class="inline-block mb-2">Email</label>
-              <input
+              <VeeField
+                name="email"
                 type="email"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email"
               />
+              <!-- CORRECT -->
             </div>
             <!-- Password -->
             <div class="mb-3">
@@ -106,7 +108,8 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email"
               />
-              <ErrorMessage class="text-red-500" email="email" />
+              <ErrorMessage class="text-red-500" name="email" />
+              <!-- CORRECT -->
             </div>
 
             <!-- Age -->
@@ -197,11 +200,11 @@ export default {
     return {
       tab: 'login',
       registerSchema: {
-        name: 'required',
-        email: 'required',
-        age: 'required',
-        password: 'required',
-        confirm_password: 'required|same:password',
+        name: 'required|min:3|max:100|alpha_spaces',
+        email: 'required|email',
+        age: 'required|min_value:18|max_value:99',
+        password: 'required|min:3|max:100',
+        confirm_password: 'required|confirmed:@password',
         country: 'required',
         tos: 'required',
       },
