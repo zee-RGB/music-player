@@ -6,7 +6,12 @@
   >
     {{ reg_alert_msg }}
   </div>
-  <VeeForm :validation-schema="registerSchema" @submit="onRegister" :initial-values="userData">
+  <VeeForm
+    ref="registerForm"
+    :validation-schema="registerSchema"
+    @submit="onRegister"
+    :initial-values="userData"
+  >
     <!-- Name -->
     <div class="mb-3">
       <label class="inline-block mb-2">Name</label>
@@ -110,6 +115,9 @@
 </template>
 
 <script>
+import { auth } from '@/includes/firebase'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+
 export default {
   name: 'RegisterForm',
   data() {
@@ -135,15 +143,36 @@ export default {
   },
 
   methods: {
-    onRegister(values) {
+    async onRegister(values) {
       this.reg_in_submission = true
       this.reg_show_alert = true
       this.reg_alert_variant = 'bg-blue-500'
       this.reg_alert_msg = 'Please wait while we register your account.'
 
-      this.reg_alert_variant = 'bg-green-500'
-      this.reg_alert_msg = 'Registration successful!'
-      console.log(values)
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, values.email, values.password)
+
+        this.reg_alert_variant = 'bg-green-500'
+        this.reg_alert_msg = 'Registration successful!'
+        console.log(userCred)
+
+        // Reset the form
+        this.$refs.registerForm.resetForm({
+          name: '',
+          email: '',
+          age: '',
+          password: '',
+          confirm_password: '',
+          country: 'USA',
+          tos: false,
+        })
+      } catch (error) {
+        this.reg_alert_variant = 'bg-red-500'
+        this.reg_alert_msg = error.message
+        console.error(error)
+      } finally {
+        this.reg_in_submission = false
+      }
     },
   },
 }

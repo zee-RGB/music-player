@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from './App.vue'
+import './includes/firebase'
 import VeeValidatePlugin from './includes/vee-validate-plugin'
 import router from './router'
 
