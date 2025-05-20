@@ -76,6 +76,34 @@
       <ErrorMessage class="text-red-500" name="confirm_password" />
     </div>
 
+    <!-- Fave Past time -->
+    <div class="mb-3">
+      <label class="inline-block mb-2">Fave Past time</label>
+      <VeeField
+        name="fave_past_time"
+        type="text"
+        class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+        placeholder="Fave Past time"
+      />
+      <ErrorMessage class="text-red-500" name="fave_past_time" />
+    </div>
+
+    <!-- Hobbies -->
+    <div class="mb-3">
+      <label class="inline-block mb-2">Hobbies</label>
+      <VeeField
+        as="select"
+        name="hobbies"
+        class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+      >
+        <option value="Sports">Sports</option>
+        <option value="Music">Music</option>
+        <option value="Food">Food</option>
+        <option value="Travel">Travel</option>
+      </VeeField>
+      <ErrorMessage class="text-red-500" name="hobbies" />
+    </div>
+
     <!-- Country -->
     <div class="mb-3">
       <label class="inline-block mb-2">Country</label>
@@ -109,14 +137,14 @@
       class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700"
       :disabled="reg_in_submission"
     >
-      Submit
+      {{ reg_in_submission ? 'Loading...' : 'Submit' }}
     </button>
   </VeeForm>
 </template>
 
 <script>
-import { auth } from '@/includes/firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import useUserStore from '@/stores/user'
+import { mapActions } from 'pinia'
 
 export default {
   name: 'RegisterForm',
@@ -130,6 +158,8 @@ export default {
         confirm_password: 'required|confirmed:@password',
         country: 'required|excluded:Australia',
         tos: 'tos',
+        fave_past_time: 'required|excluded:password,1234|max:25',
+        hobbies: 'required|excluded:cooking',
       },
 
       userData: {
@@ -143,6 +173,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(useUserStore, {
+      createUser: 'register',
+    }),
+
     async onRegister(values) {
       this.reg_in_submission = true
       this.reg_show_alert = true
@@ -150,13 +184,11 @@ export default {
       this.reg_alert_msg = 'Please wait while we register your account.'
 
       try {
-        const userCred = await createUserWithEmailAndPassword(auth, values.email, values.password)
+        await this.createUser(values)
 
         this.reg_alert_variant = 'bg-green-500'
         this.reg_alert_msg = 'Registration successful!'
-        console.log(userCred)
 
-        // Reset the form
         this.$refs.registerForm.resetForm({
           name: '',
           email: '',
@@ -164,6 +196,8 @@ export default {
           password: '',
           confirm_password: '',
           country: 'USA',
+          hobbies: '',
+          fave_past_time: '',
           tos: false,
         })
       } catch (error) {
