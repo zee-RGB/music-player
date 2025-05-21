@@ -32,6 +32,10 @@ import pwaIcon from '@/assets/img/pwa-192x192.png'
 import songHeader from '@/assets/img/song-header.png'
 import userHeader from '@/assets/img/user-header.png'
 
+import useUserStore from '@/stores/user'
+import { mapWritableState } from 'pinia'
+import { auth } from './includes/firebase'
+
 export default {
   components: {
     AppHeader,
@@ -53,6 +57,15 @@ export default {
         userHeader,
       },
     }
+  },
+
+  computed: {
+    ...mapWritableState(useUserStore, ['userLoggedIn']),
+  },
+  created() {
+    auth.onAuthStateChanged((user) => {
+      this.userLoggedIn = !!user
+    })
   },
 }
 </script>
