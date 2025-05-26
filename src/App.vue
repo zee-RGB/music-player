@@ -3,11 +3,8 @@
     <!-- Header -->
     <AppHeader />
 
-    <!-- Introduction -->
-    <IntroductionApp :images="images" />
-
     <!-- Main Content -->
-    <MainContent />
+    <router-view />
 
     <!-- Player -->
     <AppPlayer />
@@ -19,13 +16,9 @@
 
 <script>
 import AppHeader from '@/components/AppHeader.vue'
-import IntroductionApp from '@/components/IntroductionApp.vue'
-import MainContent from '@/components/MainContent.vue'
 import AppPlayer from './components/AppPlayer.vue'
 import AuthModal from './components/AuthModal.vue'
 
-import header from '@/assets/img/header.png'
-import introductionMusic from '@/assets/img/introduction-music.png'
 import introductionUsers from '@/assets/img/introduction-users.png'
 import profilePic from '@/assets/img/profile-pic.jpg'
 import pwaIcon from '@/assets/img/pwa-192x192.png'
@@ -39,8 +32,6 @@ import { auth } from './includes/firebase'
 export default {
   components: {
     AppHeader,
-    IntroductionApp,
-    MainContent,
     AppPlayer,
     AuthModal,
   },
@@ -48,8 +39,6 @@ export default {
   data() {
     return {
       images: {
-        header,
-        introductionMusic,
         introductionUsers,
         profilePic,
         pwaIcon,
