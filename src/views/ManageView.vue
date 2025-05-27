@@ -1,3 +1,4 @@
+import useUserStore from '@/stores/user';
 <template>
   <section class="container mx-auto mt-6">
     <div class="md:grid md:grid-cols-3 md:gap-4">
@@ -135,4 +136,8 @@
   </section>
 </template>
 
-<script></script>
+<script>
+export default {
+  name: 'ManageView',
+}
+</script>
