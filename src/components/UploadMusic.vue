@@ -22,24 +22,18 @@
       <hr class="my-6" />
 
       <!-- Progess Bars -->
-      <div class="mb-4">
+      <div class="mb-4" v-for="upload in uploads" :key="upload.name">
         <!-- File Name -->
-        <div class="font-bold text-sm">Just another song.mp3</div>
+        <div class="font-bold text-sm" :class="upload.text_class">
+          <i :class="upload.icon"> </i> {{ upload.name }}
+        </div>
         <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
           <!-- Inner Progress Bar -->
-          <div class="transition-all progress-bar bg-blue-400" style="width: 75%"></div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <div class="font-bold text-sm">Just another song.mp3</div>
-        <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-          <div class="transition-all progress-bar bg-blue-400" style="width: 35%"></div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <div class="font-bold text-sm">Just another song.mp3</div>
-        <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-          <div class="transition-all progress-bar bg-blue-400" style="width: 55%"></div>
+          <div
+            class="transition-all progress-bar"
+            :style="{ width: upload.current_progress + '%' }"
+            :class="upload.variant"
+          ></div>
         </div>
       </div>
     </div>
@@ -47,11 +41,14 @@
 </template>
 
 <script>
+import { storage } from '@/includes/firebase'
+
 export default {
   name: 'UploadMusic',
   data() {
     return {
       is_dragover: false,
+      uploads: [],
     }
   },
   methods: {
@@ -60,13 +57,44 @@ export default {
 
       const files = [...$event.dataTransfer.files]
       files.forEach((file) => {
-        if (file.type !== 'audio/mp3') {
+        if (file.type !== 'audio/mpeg') {
           alert('Only MP3 files are allowed.')
-        } else {
-          // Simulate file upload
-          console.log(`Uploading ${file.name}...`)
-          // Here you would typically handle the file upload logic
         }
+
+        const storageRef = storage.ref()
+        const songsRef = storageRef.child(`songs/${file.name}`)
+        const task = songsRef.put(file)
+
+        const uploadIndex =
+          this.uploads.push({
+            task,
+            current_progress: 0,
+            name: file.name,
+            variant: 'bg-blue-400',
+            icon: 'fas fa-spinner fa-spin',
+            text_class: '',
+          }) - 1
+
+        task.on(
+          'state_changed',
+          (snapshot) => {
+            // Progress function
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            this.uploads[uploadIndex].current_progress = progress
+          },
+          () => {
+            // Error function
+            this.uploads[uploadIndex].variant = 'bg-red-400'
+            this.uploads[uploadIndex].icon = 'fas fa-times'
+            this.uploads[uploadIndex].text_class = 'text-red-400'
+          },
+          () => {
+            // Complete function
+            this.uploads[uploadIndex].variant = 'bg-green-400'
+            this.uploads[uploadIndex].icon = 'fas fa-check'
+            this.uploads[uploadIndex].text_class = 'text-green-400'
+          },
+        )
       })
     },
   },
