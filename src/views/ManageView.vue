@@ -14,7 +14,13 @@ import useUserStore from '@/stores/user';
           </div>
           <div class="p-6">
             <!-- Composition Items -->
-            <CompositionItem v-for="song in songs" :key="song.docID" :song="song" />
+            <CompositionItem
+              v-for="(song, index) in songs"
+              :key="song.docID"
+              :song="song"
+              :updateSong="updateSong"
+              :index="index"
+            />
           </div>
         </div>
       </div>
@@ -55,6 +61,21 @@ export default {
       }
       this.songs.push(song)
     })
+  },
+  methods: {
+    async updateSong(i, values) {
+      this.songs[i].name = values.modified_name
+      this.songs[i].genre = values.modified_genre
+
+      try {
+        await songsCollection.doc(this.songs[i].docID).update({
+          name: values.modified_name,
+          genre: values.modified_genre,
+        })
+      } catch (error) {
+        console.error('Error updating song:', error)
+      }
+    },
   },
 }
 </script>
