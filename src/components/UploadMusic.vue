@@ -19,6 +19,11 @@
       >
         <h5>Drop your files here</h5>
       </div>
+
+      <button class="m-2 border-black w-full">
+        <input type="file" multiple @change="upload($event)" />
+      </button>
+
       <hr class="my-6" />
 
       <!-- Progess Bars -->
@@ -55,7 +60,8 @@ export default {
     upload($event) {
       this.is_dragover = false
 
-      const files = [...$event.dataTransfer.files]
+      const files = $event.dataTransfer ? [...$event.dataTransfer.files] : [...$event.target.files]
+
       files.forEach((file) => {
         if (file.type !== 'audio/mpeg') {
           alert('Only MP3 files are allowed.')
@@ -106,6 +112,18 @@ export default {
             this.uploads[uploadIndex].text_class = 'text-green-400'
           },
         )
+      })
+    },
+
+    cancelUploads() {
+      this.uploads.forEach((upload) => {
+        upload.task.cancel()
+      })
+    },
+
+    beforeUnmount() {
+      this.uploads.forEach((upload) => {
+        upload.task.cancel()
       })
     },
   },

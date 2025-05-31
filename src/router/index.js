@@ -47,16 +47,14 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // console.log(to.meta)
-  if (!to.meta.requiresAuth) {
-    next()
-  }
   const userStore = useUserStore()
-  if (userStore.userLoggedIn) {
-    next()
-  } else {
+  // console.log(to.meta)
+  if (to.meta.requiresAuth && !userStore.userLoggedIn) {
     next({ name: 'home' })
+    return // Add return to prevent multiple next() calls
   }
+
+  next()
 })
 
 export default router
