@@ -1,8 +1,11 @@
 <template>
   <div class="border border-gray-200 p-3 mb-4 rounded">
     <div v-show="!showForm">
-      <h4 class="inline-block text-2xl font-bold">Song Name</h4>
-      <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
+      <h4 class="inline-block text-2xl font-bold">{{ song.modified_name }}</h4>
+      <button
+        class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right"
+        @click.prevent="delete -song"
+      >
         <i class="fa fa-times"></i>
       </button>
       <button
@@ -27,6 +30,7 @@
             type="text"
             class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
             placeholder="Enter Song Title"
+            @input="$emit('update:unsavedChanges', true)"
           />
           <ErrorMessage class="text-red-600" name="modified_name" />
         </div>
@@ -37,6 +41,7 @@
             type="text"
             class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
             placeholder="Enter Genre"
+            @input="$emit('update:unsavedChanges', true)"
           />
           <ErrorMessage class="text-red-600" name="modified_genre" />
         </div>
@@ -61,7 +66,7 @@
 </template>
 
 <script>
-import { songsCollection } from '@/includes/firebase'
+import { songsCollection, storage } from '@/includes/firebase'
 
 export default {
   name: 'CompositionItem',
@@ -77,6 +82,13 @@ export default {
     index: {
       type: Number,
       required: true,
+    },
+    removeSong: {
+      type: Function,
+      required: true,
+    },
+    unsavedChanges: {
+      type: Boolean,
     },
   },
   data() {
@@ -109,11 +121,26 @@ export default {
         this.alert_message = `Error: ${error.message}`
       } finally {
         this.updateSong(this.index, values)
+        this.$emit('update:unsavedChanges', false)
 
         this.in_submission = false
         this.showForm = false
         this.alert_message = 'Song updated successfully!'
       }
+    },
+    async delete_song() {
+      const storageRef = storage.ref()
+      const songRef = storageRef.child(`songs/${this.song.name}`)
+
+      try {
+        await songsCollection.doc(this.song.docID).delete()
+        await songRef.delete()
+
+        this.$emit('songDeleted', this.index)
+      } catch (error) {
+        console.error('Error deleting song:', error)
+      }
+      this.removeSong(this.index)
     },
   },
 }

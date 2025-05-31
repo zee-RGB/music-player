@@ -3,7 +3,7 @@ import useUserStore from '@/stores/user';
   <section class="container mx-auto mt-6">
     <div class="md:grid md:grid-cols-3 md:gap-4">
       <div class="col-span-1">
-        <UploadMusic ref="uploadMusic" />
+        <UploadMusic ref="uploadMusic" :addSong="addSong" />
       </div>
 
       <div class="col-span-2">
@@ -20,6 +20,8 @@ import useUserStore from '@/stores/user';
               :song="song"
               :updateSong="updateSong"
               :index="index"
+              :removeSong="removeSong"
+              :unsavedChanges="unsavedChanges"
             />
           </div>
         </div>
@@ -44,24 +46,29 @@ export default {
   data() {
     return {
       songs: [],
+      unsavedChanges: false,
     }
   },
 
   beforeRouteLeave(to, from, next) {
-    this.$refs.uploadMusic.cancelUpload()
-    next()
+    if (!this.unsavedChanges) {
+      next()
+    } else {
+      const confirmLeave = confirm('You have unsaved changes. Are you sure you want to leave?')
+      if (confirmLeave) {
+        this.$refs.uploadMusic.cancelUpload()
+        next()
+      } else {
+        next(false)
+      }
+    }
   },
 
   async created() {
     const snapshot = await songsCollection.where('uid', '==', auth.currentUser.uid).get()
-    snapshot.forEach((document) => {
-      const song = {
-        ...document.data(),
-        docID: document.id,
-      }
-      this.songs.push(song)
-    })
+    snapshot.forEach(this.addSong)
   },
+
   methods: {
     async updateSong(i, values) {
       this.songs[i].name = values.modified_name
@@ -75,6 +82,21 @@ export default {
       } catch (error) {
         console.error('Error updating song:', error)
       }
+    },
+
+    async removeSong(i) {
+      this.splice(i, 1)
+    },
+
+    addSong(document) {
+      const song = {
+        ...document.data(),
+        docID: document.id,
+      }
+      this.songs.push(song)
+    },
+    updatedChanged(value) {
+      this.unsavedChanges = value
     },
   },
 }
