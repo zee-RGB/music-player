@@ -83,7 +83,8 @@
 </template>
 
 <script>
-import { songsCollection } from '@/includes/firebase'
+import { auth, commentsCollection, songsCollection } from '@/includes/firebase'
+import { addDoc, doc, getDoc } from 'firebase/firestore'
 
 export default {
   name: 'SongView',
@@ -91,9 +92,11 @@ export default {
   async created() {
     const songId = this.$route.params.id
     try {
-      const songDocSnapshot = await songsCollection.doc(songId).get()
-      if (songDocSnapshot.exists) {
-        this.song = songDocSnapshot.data()
+      const songRef = doc(songsCollection, songId)
+      const songSnapshot = await getDoc(songRef)
+
+      if (songSnapshot.exists()) {
+        this.song = songSnapshot.data()
       } else {
         this.$router.push({ name: 'home' })
       }
@@ -109,6 +112,7 @@ export default {
       schema: {
         comment: 'required|min:3',
       },
+
       comment_in_submission: false,
       comment_show_alert: false,
       comment_alert_variant: 'bg-blue-500',
@@ -116,12 +120,33 @@ export default {
     }
   },
   methods: {
-    async addComment(values) {
+    async addComment(values, { resetForm }) {
       this.comment_in_submission = true
       this.comment_show_alert = true
-
       this.comment_alert_variant = 'bg-blue-500'
       this.comment_alert_message = 'Please wait while your comment is being submitted.'
+
+      try {
+        const comment = {
+          content: values.comment,
+          datePosted: new Date().toString(),
+          sid: this.$route.params.id,
+          name: auth.currentUser ? auth.currentUser.displayName : 'Anonymous',
+          uid: auth.currentUser.uid,
+        }
+
+        await addDoc(commentsCollection, comment)
+
+        this.comment_alert_variant = 'bg-green-500'
+        this.comment_alert_message = 'Your comment has been added.'
+        resetForm()
+      } catch (error) {
+        console.error('Error:', error)
+        this.comment_alert_variant = 'bg-red-500'
+        this.comment_alert_message = 'Error adding comment. Please try again.'
+      } finally {
+        this.comment_in_submission = false
+      }
     },
   },
 }

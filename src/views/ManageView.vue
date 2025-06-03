@@ -27,6 +27,7 @@ import useUserStore from '@/stores/user';
         </div>
       </div>
     </div>
+    <Song />
   </section>
 </template>
 
@@ -34,6 +35,7 @@ import useUserStore from '@/stores/user';
 import CompositionItem from '@/components/CompositionItem.vue'
 import UploadMusic from '@/components/UploadMusic.vue'
 import { auth, songsCollection } from '@/includes/firebase'
+import Song from './Song.vue'
 
 export default {
   name: 'ManageView',
@@ -41,6 +43,7 @@ export default {
   components: {
     UploadMusic,
     CompositionItem,
+    Song,
   },
 
   data() {
