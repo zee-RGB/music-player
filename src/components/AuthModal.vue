@@ -73,7 +73,6 @@ import { useModalStore } from '@/stores/modal'
 import { mapState, mapWritableState } from 'pinia'
 
 export default {
-  props: ['images'],
   components: {
     AppLoginForm,
     AppRegisterForm,
